@@ -17,12 +17,12 @@ class nagios::munin inherits munin::plugins::base {
 
     exec { 'munin_nagios2stats_link':
         command => 'ln -s /usr/sbin/nagios2stats /usr/local/sbin/nagiostats',
-        onlyif => ["test ! -e /usr/local/sbin/nagiostats", "test -e /usr/sbin/nagios2stats"],
+        onlyif => ["/usr/bin/test ! -e /usr/local/sbin/nagiostats", "/usr/bin/test -e /usr/sbin/nagios2stats"],
     }
 
     exec { 'munin_nagios3stats_link':
         command => 'ln -s /usr/sbin/nagios3stats /usr/local/sbin/nagiostats',
-        onlyif => ["test ! -e /usr/local/sbin/nagiostats", "test -e /usr/sbin/nagios3stats"],
+        onlyif => ["/usr/bin/test ! -e /usr/local/sbin/nagiostats", "/usr/bin/test -e /usr/sbin/nagios3stats"],
     }
 
 }
