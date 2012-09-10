@@ -6,9 +6,9 @@ class nagios::apache inherits ::apache {
         'debian': {
             file { "${nagios::defaults::vars::int_nagios_cfgdir}/apache2.conf":
                 ensure => present,
-                source => ["puppet:///site-nagios/configs/${fqdn}/apache2.conf",
-                           "puppet:///site-nagios/configs/apache2.conf",
-                           "puppet:///nagios/configs/apache2.conf"],
+                source => ["puppet:///modules/site_nagios/configs/${fqdn}/apache2.conf",
+                           "puppet:///modules/site_nagios/configs/apache2.conf",
+                           "puppet:///modules/nagios/configs/apache2.conf"],
             }
 
             apache::config::global { "nagios3.conf":
