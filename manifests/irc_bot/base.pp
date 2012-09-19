@@ -1,29 +1,29 @@
 class nagios::irc_bot::base {
 
     # Default values for the two first variables are defined in nagios::irc_bot
-    $nagios_nsa_socket = $nagios_nsa_socket ? {
-        '' => $nagios_nsa_default_socket,
-        default => $nagios_nsa_socket,
+    $nsa_socket = $nsa_socket ? {
+        '' => $nsa_default_socket,
+        default => $nsa_socket,
     }
-    $nagios_nsa_pidfile = $nagios_nsa_pidfile ? {
-        '' => $nagios_nsa_default_pidfile,
-        default => $nagios_nsa_pidfile,
+    $nsa_pidfile = $nsa_pidfile ? {
+        '' => $nsa_default_pidfile,
+        default => $nsa_pidfile,
     }
-    $nagios_nsa_port = $nagios_nsa_port ? {
+    $nsa_port = $nsa_port ? {
         '' => '6667',
-        default => $nagios_nsa_port,
+        default => $nsa_port,
     }
-    $nagios_nsa_realname = $nagios_nsa_realname ? {
+    $nsa_realname = $nsa_realname ? {
         '' => 'Nagios',
-        default => $nagios_nsa_realname,
+        default => $nsa_realname,
     }
 
-    if (! $nagios_nsa_password) {
-        $nagios_nsa_password = ''
+    if (! $nsa_password) {
+        $nsa_password = ''
     }
 
-    if (! $nagios_nsa_usenotices) {
-      $nagios_nsa_usenotices = ''
+    if (! $nsa_usenotices) {
+      $nsa_usenotices = ''
     }
     
     file { "/usr/local/bin/riseup-nagios-client.pl":
