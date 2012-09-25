@@ -1,6 +1,6 @@
 define nagios::service (
     $ensure = present,
-    $host_name = $fqdn,
+    $host_name = $::fqdn,
     $check_command,
     $check_period = '',
     $normal_check_interval = '',
@@ -19,7 +19,7 @@ define nagios::service (
 
     # TODO: this resource should normally accept all nagios_host parameters
 
-    $real_name = "${hostname}_${name}"
+    $real_name = "${::hostname}_${name}"
 
     if ($use_nrpe == 'true') {
 	include nagios::command::nrpe_timeout

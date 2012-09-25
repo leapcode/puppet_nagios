@@ -8,28 +8,36 @@
 # Marcel Härry haerry+puppet(at)puzzle.ch
 # Simon Josi josi+puppet(at)puzzle.ch
 #
-# This program is free software; you can redistribute 
-# it and/or modify it under the terms of the GNU 
-# General Public License version 3 as published by 
+# This program is free software; you can redistribute
+# it and/or modify it under the terms of the GNU
+# General Public License version 3 as published by
 # the Free Software Foundation.
 #
 
-class nagios {
-    case $nagios_httpd {
-        'absent': { }
-        'lighttpd': { include lighttpd }
-        'apache': { include apache }
-        default: { include apache }
+class nagios(
+  $httpd = 'apache',
+  $allow_external_cmd = false,
+  $manage_shorewall = false,
+  $manage_munin = false
+) {
+  case $nagios::httpd {
+    'absent': { }
+    'lighttpd': { include ::lighttpd }
+    'apache': { include ::apache }
+    default: { include ::apache }
+  }
+  case $::operatingsystem {
+    'centos': {
+      $cfgdir = '/etc/nagios'
+      include nagios::centos
     }
-    case $operatingsystem {
-        'centos': {
-            $nagios_cfgdir = '/etc/nagios'
-            include nagios::centos
-        }
-        'debian': {
-            $nagios_cfgdir = '/etc/nagios3'
-            include nagios::debian
-        }
-        default: { fail("No such operatingsystem: $operatingsystem yet defined") }
+    'debian': {
+      $cfgdir = '/etc/nagios3'
+      include nagios::debian
     }
+    default: { fail("No such operatingsystem: ${::operatingsystem} yet defined") }
+  }
+  if $manage_munin {
+    include nagios::munin
+  }
 }
