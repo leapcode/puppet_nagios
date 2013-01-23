@@ -185,6 +185,7 @@ For the irc_bot class:
                   'notice' if you would prefer them to be sent as IRC
                   NOTICE messages.
 
+
 PNP4Nagios Nagios Grapher integration
 =====================================
 
