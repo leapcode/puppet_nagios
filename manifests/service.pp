@@ -30,14 +30,14 @@ define nagios::service (
     if $check_comand == 'absent' {
       fail("Must pass a check_command to ${name} if it should be present")
     }
-    if ($use_nrpe == 'true') {
-	    include nagios::command::nrpe_timeout
+    if ($use_nrpe == true) {
+            include nagios::command::nrpe_timeout
 
       if ($nrpe_args != '') {
-	      $real_check_command = "check_nrpe_timeout!$nrpe_timeout!$check_command!\"$nrpe_args\""
-	    } else {
-	      $real_check_command = "check_nrpe_1arg_timeout!$nrpe_timeout!$check_command"
-	    }
+              $real_check_command = "check_nrpe_timeout!$nrpe_timeout!$check_command!\"$nrpe_args\""
+            } else {
+              $real_check_command = "check_nrpe_1arg_timeout!$nrpe_timeout!$check_command"
+            }
     } else {
       $real_check_command = "$check_command"
     }
