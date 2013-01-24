@@ -12,7 +12,7 @@ define nagios::service (
   $contact_groups = '',
   $use = 'generic-service',
   $service_description = 'absent',
-  $use_nrpe = '',
+  $use_nrpe = false,
   $nrpe_args = '',
   $nrpe_timeout = 10
 ) {
