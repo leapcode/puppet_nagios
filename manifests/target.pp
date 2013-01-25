@@ -4,19 +4,23 @@ class nagios::target(
   $parents = 'absent',
   $address = $::ipaddress,
   $nagios_alias = $::hostname,
-  $hostgroups = 'absent'
+  $hostgroups = 'absent',
+  $notes = 'absent'
 ){
   @@nagios_host { $::fqdn:
     address => $address,
-    alias => $nagios_alias,
-    use => 'generic-host',
+    alias   => $nagios_alias,
+    use     => 'generic-host',
   }
 
   if ($parents != 'absent') {
-    Nagios_host["${::fqdn}"] { parents => $parents }
+    Nagios_host[ $::fqdn ] { parents => $parents }
   }
 
   if ($hostgroups != 'absent') {
-    Nagios_host["${::fqdn}"] { hostgroups => $hostgroups }  
+    Nagios_host[ $::fqdn ] { hostgroups => $hostgroups }
+  }
+  if ($notes != 'absent') {
+    Nagios_host[ $::fqdn ] { notes => $notes }
   }
 }
