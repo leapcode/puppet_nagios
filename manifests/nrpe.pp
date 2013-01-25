@@ -8,10 +8,10 @@ class nagios::nrpe {
 
             include nagios::nrpe::freebsd
         }
-        'Debian': {
+        'Debian','Ubuntu': {
             if $nagios_nrpe_pid_file == '' { $nagios_nrpe_pid_file = '/var/run/nagios/nrpe.pid' }
             if $nagios_plugin_dir == '' { $nagios_plugin_dir = '/usr/lib/nagios/plugins' }
-            include nagios::nrpe::linux
+            include nagios::nrpe::debian
         }
         default: {
             if $nagios_nrpe_pid_file == '' { $nagios_nrpe_pid_file = '/var/run/nrpe.pid' }
