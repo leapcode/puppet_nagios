@@ -92,27 +92,23 @@ class nagios::base {
 
     Nagios_command <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_command.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
     Nagios_contact <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_contact.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
     Nagios_contactgroup <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_contactgroup.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
     Nagios_host <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_host.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
     Nagios_hostdependency <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostdependency.cfg",
@@ -126,21 +122,18 @@ class nagios::base {
     }
     Nagios_hostextinfo <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostextinfo.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
     Nagios_hostgroup <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostgroup.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
     Nagios_service <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_service.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
     Nagios_servicegroup <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_servicegroup.cfg",
@@ -149,27 +142,23 @@ class nagios::base {
     }
     Nagios_servicedependency <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_servicedependency.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
     Nagios_serviceescalation <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_serviceescalation.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
     Nagios_serviceextinfo <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_serviceextinfo.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
     Nagios_timeperiod <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_timeperiod.cfg",
-        require => File['nagios_confd'],
+        require => [ File['nagios_confd'], Package['nagios'] ],
         notify => Service['nagios'],
-        require => Package['nagios'],
     }
 
     file{[ "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_command.cfg",
