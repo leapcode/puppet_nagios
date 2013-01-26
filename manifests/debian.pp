@@ -18,13 +18,15 @@ class nagios::debian inherits nagios::base {
             path   => "${nagios::defaults::vars::int_cfgdir}/commands.cfg",
             ensure => present,
             notify => Service['nagios'],
-            mode   => 0644, owner => root, group => root;
+            mode   => 0644, owner => root, group => root,
+            require => Package['nagios'],
     }
 
     file { "${nagios::defaults::vars::int_cfgdir}/stylesheets":
         ensure => directory,
         purge => false,
         recurse => true,
+        require => Package['nagios'],
     }
 
     if $nagios::allow_external_cmd {
@@ -33,16 +35,19 @@ class nagios::debian inherits nagios::base {
             unless => 'dpkg-statoverride --list nagios www-data 2710 /var/lib/nagios3/rw && dpkg-statoverride --list nagios nagios 751 /var/lib/nagios3',
             logoutput => false,
             notify => Service['nagios'],
+            require => Package['nagios'],
         }
         exec { 'nagios_external_cmd_perms_1':
             command => 'chmod 0751 /var/lib/nagios3 && chown nagios:nagios /var/lib/nagios3',
             unless => 'test "`stat -c "%a %U %G" /var/lib/nagios3`" = "751 nagios nagios"',
             notify => Service['nagios'],
+            require => Package['nagios'],
         }
         exec { 'nagios_external_cmd_perms_2':
             command => 'chmod 2751 /var/lib/nagios3/rw && chown nagios:www-data /var/lib/nagios3/rw',
             unless => 'test "`stat -c "%a %U %G" /var/lib/nagios3/rw`" = "2751 nagios www-data"',
             notify => Service['nagios'],
+            require => Package['nagios'],
         }
     }
 }

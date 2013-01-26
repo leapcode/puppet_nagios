@@ -23,7 +23,8 @@ class nagios::base {
                         "puppet:///modules/nagios/configs/${::operatingsystem}/nagios.cfg",
                         "puppet:///modules/nagios/configs/nagios.cfg" ],
             notify => Service['nagios'],
-            mode => 0644, owner => root, group => root;
+            mode => 0644, owner => root, group => root,
+            require => Package['nagios'],
     }
 
     file { 'nagios_cgi_cfg':
@@ -35,13 +36,15 @@ class nagios::base {
                     "puppet:///modules/nagios/configs/cgi.cfg" ],
         mode => '0644', owner => 'root', group => 0,
         notify => Service['apache'],
+        require => Package['nagios'],
     }
 
     file { 'nagios_htpasswd':
         path => "${nagios::defaults::vars::int_cfgdir}/htpasswd.users",
         source => [ "puppet:///modules/site_nagios/htpasswd.users",
                     "puppet:///modules/nagios/htpasswd.users" ],
-        mode => 0640, owner => root, group => apache;
+        mode => 0640, owner => root, group => apache,
+        require => Package['nagios'],
     }
 
     file { 'nagios_private':
@@ -50,7 +53,8 @@ class nagios::base {
         purge => true,
         recurse => true,
         notify => Service['nagios'],
-        mode => '0750', owner => root, group => nagios;
+        mode => '0750', owner => root, group => nagios,
+        require => Package['nagios'],
     }
 
     file { 'nagios_private_resource_cfg':
@@ -58,7 +62,8 @@ class nagios::base {
         source => [ "puppet:///modules/site_nagios/configs/${::operatingsystem}/private/resource.cfg.${::architecture}",
                     "puppet:///modules/nagios/configs/${::operatingsystem}/private/resource.cfg.${::architecture}" ],
         notify => Service['nagios'],
-        owner => root, group => nagios, mode => '0640';
+        owner => root, group => nagios, mode => '0640',
+        require => Package['nagios'],
     }
 
     file { 'nagios_confd':
@@ -67,7 +72,8 @@ class nagios::base {
         purge => true,
         recurse => true,
         notify => Service['nagios'],
-        mode => '0750', owner => root, group => nagios;
+        mode => '0750', owner => root, group => nagios,
+        require => Package['nagios'],
     }
     Nagios_command <<||>>
     Nagios_contactgroup <<||>>
@@ -88,68 +94,82 @@ class nagios::base {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_command.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_contact <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_contact.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_contactgroup <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_contactgroup.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_host <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_host.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_hostdependency <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostdependency.cfg",
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_hostescalation <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostescalation.cfg",
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_hostextinfo <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostextinfo.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_hostgroup <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostgroup.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_service <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_service.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_servicegroup <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_servicegroup.cfg",
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_servicedependency <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_servicedependency.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_serviceescalation <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_serviceescalation.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_serviceextinfo <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_serviceextinfo.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
     Nagios_timeperiod <||> {
         target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_timeperiod.cfg",
         require => File['nagios_confd'],
         notify => Service['nagios'],
+        require => Package['nagios'],
     }
 
     file{[ "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_command.cfg",
@@ -170,7 +190,8 @@ class nagios::base {
         ensure => file,
         replace => false,
         notify => Service['nagios'],
-        mode => 0644, owner => root, group => 0;
+        mode => 0644, owner => root, group => 0,
+        require => Package['nagios'],
     }
 
     # manage nagios cfg files
@@ -181,6 +202,7 @@ class nagios::base {
         recurse => true,
         purge => true,
         notify => Service['nagios'],
-        mode => 0755, owner => root, group => root;
+        mode => 0755, owner => root, group => root,
+        require => Package['nagios'],
     }
 }
