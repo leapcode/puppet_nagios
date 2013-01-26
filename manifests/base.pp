@@ -194,4 +194,9 @@ class nagios::base {
         mode => 0755, owner => root, group => root,
         require => Package['nagios'],
     }
+
+  file { [ '/usr/lib64', '/usr/lib64/nagios', '/usr/lib64/nagios/plugins/' ]:
+    ensure => directory
+  }
+
 }
