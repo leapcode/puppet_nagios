@@ -23,6 +23,10 @@ class nagios::defaults::commands {
           command_line => '$USER1$/check_mysql -H $ARG1$ -P $ARG2$ -u $ARG3$ -p $ARG4$ -d $ARG5$';
         'check_ntp_time':
           command_line => '$USER1$/check_ntp_time -H $HOSTADDRESS$ -w 0.5 -c 1';
+        'check_openvpn_server':
+          command_line => '$USER1$/check_openvpn_server.pl -H $HOSTADDRESS$ -p 1194';
+        'check_openvpn_server_ip_port':
+          command_line => '$USER1$/check_openvpn_server.pl -H $ARG1$ -p $ARG2$';
         'check_silc':
           command_line => '$USER1$/check_tcp -p 706 -H $ARG1$';
         'check_sobby':
