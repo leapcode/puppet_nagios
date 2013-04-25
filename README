@@ -12,6 +12,11 @@ In it's current form, this module can be used on CentOS and Debian.
 Overview
 ========
 
+Requirements
+------------
+
+To use the nrpe functionality, you will need the perl module installed.
+
 To use the nagios resources, activate storeconfigs on the
 puppetmaster.
 

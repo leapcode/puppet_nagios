@@ -4,7 +4,9 @@ class nagios::nrpe::base {
     if $processorcount == '' { $processorcount = 1 }
 
     # libwww-perl for check_apache
-    package { [ 'nagios-nrpe-server', 'nagios-plugins-basic', 'libwww-perl' ]:
+    include perl::extensions::libwww 
+
+    package { [ 'nagios-nrpe-server', 'nagios-plugins-basic' ]:
       ensure => present;
     }
 
