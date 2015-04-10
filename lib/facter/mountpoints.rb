@@ -12,21 +12,23 @@ begin
       require 'filesystem'
     rescue Exception => e
       confine :kernel => :linux
-      ENV["PATH"]="/bin:/sbin:/usr/bin:/usr/sbin"
-      fs_source = nil
-      if FileTest.exists?("/etc/mtab")
-        fs_source = "/etc/mtab" 
-      elsif FileTest.exists?("/proc/mounts")
-        fs_source = "/proc/mounts" 
-      end
-
-      mounts = File.read(fs_source).split("\n")
-      mounts.each do |mount|
-        mount = mount.split(" ")
-        if ((not ignorefs.include?(mount[2])) && (mount[3] !~ /bind/) && (not devices.include?(mount[0])) && (not mountpoints.include?(mount[1])))
-	              mountpoints.push(mount[1])
+      setcode do
+        ENV["PATH"]="/bin:/sbin:/usr/bin:/usr/sbin"
+        fs_source = nil
+        if FileTest.exists?("/etc/mtab")
+          fs_source = "/etc/mtab"
+        elsif FileTest.exists?("/proc/mounts")
+          fs_source = "/proc/mounts"
         end
-        devices.push(mount[0]) if not devices.include?(mount[0])
+
+        mounts = File.read(fs_source).split("\n")
+        mounts.each do |mount|
+          mount = mount.split(" ")
+          if ((not ignorefs.include?(mount[2])) && (mount[3] !~ /bind/) && (not devices.include?(mount[0])) && (not mountpoints.include?(mount[1])))
+	                mountpoints.push(mount[1])
+          end
+          devices.push(mount[0]) if not devices.include?(mount[0])
+        end
       end
     else
       FileSystem.mounts.each do |m| 
