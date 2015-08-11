@@ -1,3 +1,4 @@
+# configure nagios commands on the server
 class nagios::defaults::commands {
 
   include nagios::command::smtp
