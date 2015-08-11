@@ -27,7 +27,7 @@ define nagios::service (
   }
 
   if $ensure != 'absent' {
-    if $check_comand == 'absent' {
+    if $check_command == 'absent' {
       fail("Must pass a check_command to ${name} if it should be present")
     }
     if $use_nrpe == true {
