@@ -136,8 +136,8 @@ class nagios::defaults::commands {
 
   nagios_command {
     'notify-host-by-email':
-      command_line => "/usr/bin/printf \"%b\" \"***** Nagios *****\\n\\nNotification Type: \$NOTIFICATIONTYPE\$\\n\\nHost:      \$HOSTNAME\$ (\$HOSTALIAS\$)\\nAddress:   \$HOSTADDRESS\$\\nState:     \$HOSTSTATE\$\\nDuration:  \$HOSTDURATION\$\\n\\nDate/Time: \$LONGDATETIME\$\\n\\nOutput:    \$HOSTOUTPUT\$\" | ${mail_cmd_location} -s \"\$NOTIFICATIONTYPE\$: \$HOSTSTATE\$ - \$HOSTNAME\$\" \$CONTACTEMAIL\$";
+      command_line => "/usr/bin/printf \"%b\" \"***** Nagios *****\\n\\nNotification Type: \$NOTIFICATIONTYPE\$\\n\\nHost:      \$HOSTNAME\$ (\$HOSTALIAS\$)\\nAddress:   \$HOSTADDRESS\$\\nState:     \$HOSTSTATE\$\\nDuration:  \$HOSTDURATION\$\\n\\nDate/Time: \$LONGDATETIME\$\\n\\nOutput:    \$HOSTOUTPUT\$\" | ${mail_cmd_location} -s \"\$HOSTSTATE\$ - \$HOSTNAME\$\" \$CONTACTEMAIL\$";
     'notify-service-by-email':
-      command_line => "/usr/bin/printf \"%b\" \"***** Nagios *****\\n\\nNotification Type: \$NOTIFICATIONTYPE\$\\n\\nHost:      \$HOSTNAME\$ (\$HOSTALIAS\$)\\nAddress:   \$HOSTADDRESS\$\\n\\nService:   \$SERVICEDESC\$\\nState:     \$SERVICESTATE\$\\nDuration:  \$SERVICEDURATION\$\\n\\nDate/Time: \$LONGDATETIME\$\\n\\nOutput:    \$SERVICEOUTPUT\$\" | ${mail_cmd_location} -s \"\$NOTIFICATIONTYPE\$: \$SERVICESTATE\$ - \$HOSTALIAS\$/\$SERVICEDESC\$\" \$CONTACTEMAIL\$";
+      command_line => "/usr/bin/printf \"%b\" \"***** Nagios *****\\n\\nNotification Type: \$NOTIFICATIONTYPE\$\\n\\nHost:      \$HOSTNAME\$ (\$HOSTALIAS\$)\\nAddress:   \$HOSTADDRESS\$\\n\\nService:   \$SERVICEDESC\$\\nState:     \$SERVICESTATE\$\\nDuration:  \$SERVICEDURATION\$\\n\\nDate/Time: \$LONGDATETIME\$\\n\\nOutput:    \$SERVICEOUTPUT\$\" | ${mail_cmd_location} -s \"\$SERVICESTATE\$ - \$HOSTALIAS\$: \$SERVICEDESC\$\" \$CONTACTEMAIL\$";
   }
 }
