@@ -32,9 +32,9 @@ Monitor
 -------
 
 On one node the "nagios" class has to be included. By default this installs
-apache using the "apache" module. To use lighttpd instead, include
-"nagios::lighttpd", or, if the web server is not to be managed by puppet,
-include "nagios::headless".
+apache using the "apache" module. To use lighttpd instead, set the "httpd"
+parameter to the "nagios" class to "lighttpd", or, if the web server is not to
+be managed by puppet, set the "httpd" parameter to "absent".
 
 
 Hosts
@@ -216,7 +216,7 @@ Usage example:
 ~~~
 node nagios {
 
-  class { 'nagios::apache': } -> class { 'nagios::defaults': }
+  class { 'nagios': } -> class { 'nagios::defaults': }
 
   # Declare another nagios command
   nagios::command { http_port:
