@@ -1,8 +1,9 @@
+# a wrapper for syncing a plugin
 define nagios::plugin(
   $source = 'absent',
-  $ensure = present
+  $ensure = present,
 ){
-  if $::hardwaremodel == 'x86_64' and $::operatingsystem != 'debian' {
+  if $::hardwaremodel == 'x86_64' and $::operatingsystem != 'Debian' {
     $real_path = "/usr/lib64/nagios/plugins/${name}"
   }
   else {

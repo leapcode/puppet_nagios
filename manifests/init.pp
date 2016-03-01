@@ -16,19 +16,21 @@
 
 # manage nagios
 class nagios(
-  $httpd = 'apache',
+  $httpd              = 'apache',
   $allow_external_cmd = false,
-  $manage_shorewall = false,
-  $manage_munin = false,
-  $stored_config = true
+  $manage_shorewall   = false,
+  $manage_munin       = false,
+  $service_atboot     = true,
+  $purge_resources    = true,
+  $gpgkey_checks      = {},
 ) {
   case $nagios::httpd {
     'absent': { }
     'lighttpd': { include ::lighttpd }
     'apache': {
       include ::apache
-      if $::operatingsystem == 'debian' {
-        include nagios::debian::apache
+      if $::operatingsystem == 'Debian' {
+        include ::nagios::debian::apache
       }
     }
     default: { include ::apache }
@@ -36,17 +38,18 @@ class nagios(
   case $::operatingsystem {
     'centos': {
       $cfgdir = '/etc/nagios'
-      include nagios::centos
+      include ::nagios::centos
     }
     'debian': {
       $cfgdir = '/etc/nagios3'
-      include nagios::debian
+      include ::nagios::debian
     }
     default: {
       fail("No such operatingsystem: ${::operatingsystem} yet defined")
     }
   }
   if $manage_munin {
-    include nagios::munin
+    include ::nagios::munin
   }
+  create_resources('nagios::service::gpgkey',$gpgkey_checks)
 }

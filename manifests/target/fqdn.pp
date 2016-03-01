@@ -1,10 +1,12 @@
+# monitor a host by fqdn
 class nagios::target::fqdn(
+  $address    = $::fqdn,
   $hostgroups = 'absent',
-  $parents = 'absent'
+  $parents    = 'absent'
 ) {
   class{'nagios::target':
-    address => $::fqdn,
+    address    => $address,
     hostgroups => $hostgroups,
-    parents => $parents
+    parents    => $parents
   }
 }

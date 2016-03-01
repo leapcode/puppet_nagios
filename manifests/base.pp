@@ -1,202 +1,182 @@
+# basic stuff for nagios
 class nagios::base {
-    # include the variables
-    include nagios::defaults::vars
+  # include the variables
+  include ::nagios::defaults::vars
 
-    package { 'nagios':
-        alias => 'nagios',
-        ensure => present,
-    }
+  package { 'nagios':
+    ensure  => present,
+  }
 
-    service { 'nagios':
-        ensure => running,
-        enable => true,
-        #hasstatus => true, #fixme!
-        require => Package['nagios'],
-    }
+  service { 'nagios':
+    ensure  => running,
+    enable  => $nagios::service_at_boot,
+    require => Package['nagios'],
+  }
 
-    # this file should contain all the nagios_puppet-paths:
-    file { 'nagios_main_cfg':
-            path => "${nagios::defaults::vars::int_cfgdir}/nagios.cfg",
-            source => [ "puppet:///modules/site_nagios/configs/${::fqdn}/nagios.cfg",
-                        "puppet:///modules/site_nagios/configs/${::operatingsystem}/nagios.cfg",
-                        "puppet:///modules/site_nagios/configs/nagios.cfg",
-                        "puppet:///modules/nagios/configs/${::operatingsystem}/nagios.cfg",
-                        "puppet:///modules/nagios/configs/nagios.cfg" ],
-            notify  => Service['nagios'],
-            require => Package['nagios'],
-            mode    => 0644, owner => root, group => root;
-    }
-
-    file { 'nagios_cgi_cfg':
-        path => "${nagios::defaults::vars::int_cfgdir}/cgi.cfg",
-        source => [ "puppet:///modules/site_nagios/configs/${::fqdn}/cgi.cfg",
+  $cfg_dir = $nagios::defaults::vars::int_cfgdir
+  # this file should contain all the nagios_puppet-paths:
+  file{
+    'nagios_cfgdir':
+      ensure  => directory,
+      path    => $cfg_dir,
+      alias   => nagios_confd,
+      recurse => true,
+      purge   => true,
+      force   => true,
+      require => Package['nagios'],
+      notify  => Service['nagios'],
+      owner   => root,
+      group   => root,
+      mode    => '0755';
+    'nagios_main_cfg':
+      path    => "${cfg_dir}/nagios.cfg",
+      source  => [ "puppet:///modules/site_nagios/configs/${::fqdn}/nagios.cfg",
+                    "puppet:///modules/site_nagios/configs/${::operatingsystem}/nagios.cfg",
+                    'puppet:///modules/site_nagios/configs/nagios.cfg',
+                    "puppet:///modules/nagios/configs/${::operatingsystem}/nagios.cfg",
+                    'puppet:///modules/nagios/configs/nagios.cfg' ],
+      notify  => Service['nagios'],
+      owner   => root,
+      group   => root,
+      mode    => '0644';
+    'nagios_cgi_cfg':
+      path    => "${cfg_dir}/cgi.cfg",
+      source  => [ "puppet:///modules/site_nagios/configs/${::fqdn}/cgi.cfg",
                     "puppet:///modules/site_nagios/configs/${::operatingsystem}/cgi.cfg",
-                    "puppet:///modules/site_nagios/configs/cgi.cfg",
+                    'puppet:///modules/site_nagios/configs/cgi.cfg',
                     "puppet:///modules/nagios/configs/${::operatingsystem}/cgi.cfg",
-                    "puppet:///modules/nagios/configs/cgi.cfg" ],
-        mode => '0644', owner => 'root', group => 0,
-        notify => Service['apache'],
-        require => Package['nagios'],
-    }
-
-    file { 'nagios_htpasswd':
-        path => "${nagios::defaults::vars::int_cfgdir}/htpasswd.users",
-        source => [ "puppet:///modules/site_nagios/htpasswd.users",
-                    "puppet:///modules/nagios/htpasswd.users" ],
-        require => Package['nagios'],
-        mode => 0640, owner => root, group => apache;
-    }
-
-    if $::operatingsystem == 'Centos' {
-      file { 'nagios_private':
-          ensure  => directory,
-          path    => "${nagios::defaults::vars::int_cfgdir}/private/",
-          purge   => true,
-          recurse => true,
-          mode    => '0750',
-          owner   => 'root',
-          group   => 'nagios',
-          require => Package['nagios'],
-          notify  => Service['nagios'],
-      }
-
-      $resource_cfg_dir = "${nagios::defaults::vars::int_cfgdir}/private"
-    }
-    else {
-      $resource_cfg_dir = $nagios::defaults::vars::int_cfgdir
-    }
-
-    file { 'nagios_private_resource_cfg':
-        path   => "${resource_cfg_dir}/resource.cfg",
-        source => [ "puppet:///modules/site_nagios/configs/${::operatingsystem}/private/resource.cfg.${::architecture}",
+                    'puppet:///modules/nagios/configs/cgi.cfg' ],
+      notify  => Service['apache'],
+      owner   => 'root',
+      group   => 0,
+      mode    => '0644';
+    'nagios_htpasswd':
+      path    => "${cfg_dir}/htpasswd.users",
+      source  => [ 'puppet:///modules/site_nagios/htpasswd.users',
+                    'puppet:///modules/nagios/htpasswd.users' ],
+      owner   => root,
+      group   => apache,
+      mode    => '0640';
+    'nagios_resource_cfg':
+      path    => "${cfg_dir}/resource.cfg",
+      source  => [ "puppet:///modules/site_nagios/configs/${::operatingsystem}/private/resource.cfg.${::architecture}",
                     "puppet:///modules/nagios/configs/${::operatingsystem}/private/resource.cfg.${::architecture}" ],
-        notify => Service['nagios'],
-        owner => root, group => nagios, mode => '0640';
-    }
+      notify  => Service['nagios'],
+      owner   => root,
+      group   => nagios,
+      mode    => '0640';
+  }
 
-    file { 'nagios_confd':
-        path => "${nagios::defaults::vars::int_cfgdir}/conf.d/",
-        ensure => directory,
-        purge => true,
-        recurse => true,
-        notify => Service['nagios'],
-        require => Package['nagios'],
-        mode => '0750', owner => root, group => nagios;
+  if $cfg_dir == '/etc/nagios3' {
+    file{'/etc/nagios':
+      ensure  => link,
+      target  => $cfg_dir,
+      require => Package['nagios'],
     }
-    Nagios_command <<||>>
-    Nagios_contactgroup <<||>>
-    Nagios_contact <<||>>
-    Nagios_hostdependency <<||>>
-    Nagios_hostescalation <<||>>
-    Nagios_hostextinfo <<||>>
-    Nagios_hostgroup <<||>>
-    Nagios_host <<||>>
-    Nagios_servicedependency <<||>>
-    Nagios_serviceescalation <<||>>
-    Nagios_servicegroup <<||>>
-    Nagios_serviceextinfo <<||>>
-    Nagios_service <<||>>
-    Nagios_timeperiod <<||>>
+  }
 
-    Nagios_command <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_command.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
-    Nagios_contact <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_contact.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
-    Nagios_contactgroup <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_contactgroup.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
-    Nagios_host <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_host.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
-    Nagios_hostdependency <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostdependency.cfg",
-        notify => Service['nagios'],
-    }
-    Nagios_hostescalation <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostescalation.cfg",
-        notify => Service['nagios'],
-    }
-    Nagios_hostextinfo <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostextinfo.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
-    Nagios_hostgroup <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostgroup.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
-    Nagios_service <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_service.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
-    Nagios_servicegroup <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_servicegroup.cfg",
-        notify => Service['nagios'],
-    }
-    Nagios_servicedependency <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_servicedependency.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
-    Nagios_serviceescalation <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_serviceescalation.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
-    Nagios_serviceextinfo <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_serviceextinfo.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
-    Nagios_timeperiod <||> {
-        target => "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_timeperiod.cfg",
-        require => File['nagios_confd'],
-        notify => Service['nagios'],
-    }
+  Nagios_command <<||>>
+  Nagios_contactgroup <<||>>
+  Nagios_contact <<||>>
+  Nagios_hostdependency <<||>>
+  Nagios_hostescalation <<||>>
+  Nagios_hostextinfo <<||>>
+  Nagios_hostgroup <<||>>
+  Nagios_host <<||>>
+  Nagios_servicedependency <<||>>
+  Nagios_serviceescalation <<||>>
+  Nagios_servicegroup <<||>>
+  Nagios_serviceextinfo <<||>>
+  Nagios_service <<||>>
+  Nagios_timeperiod <<||>>
 
-    file{[ "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_command.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_contact.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_contactgroup.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_host.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostdependency.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostescalation.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostextinfo.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostgroup.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_hostgroupescalation.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_service.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_servicedependency.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_serviceescalation.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_serviceextinfo.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_servicegroup.cfg",
-           "${nagios::defaults::vars::int_cfgdir}/conf.d/nagios_timeperiod.cfg" ]:
-        ensure => file,
-        replace => false,
-        notify => Service['nagios'],
-        require => Package['nagios'],
-        mode => 0644, owner => root, group => 0;
-    }
+  Nagios_command <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_contact <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_contactgroup <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_host <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_hostdependency <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_hostescalation <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_hostextinfo <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_hostgroup <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_service <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_servicegroup <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_servicedependency <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_serviceescalation <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_serviceextinfo <||> {
+    notify  => Service['nagios'],
+  }
+  Nagios_timeperiod <||> {
+    notify  => Service['nagios'],
+  }
 
-    # manage nagios cfg files
-    # must be defined after exported resource overrides and cfg file defs
-    file { 'nagios_cfgdir':
-        path => "${nagios::defaults::vars::int_cfgdir}/",
-        ensure => directory,
-        recurse => true,
-        purge => true,
+  file{
+    [ "${cfg_dir}/nagios_command.cfg",
+      "${cfg_dir}/nagios_contact.cfg",
+      "${cfg_dir}/nagios_contactgroup.cfg",
+      "${cfg_dir}/nagios_host.cfg",
+      "${cfg_dir}/nagios_hostdependency.cfg",
+      "${cfg_dir}/nagios_hostescalation.cfg",
+      "${cfg_dir}/nagios_hostextinfo.cfg",
+      "${cfg_dir}/nagios_hostgroup.cfg",
+      "${cfg_dir}/nagios_hostgroupescalation.cfg",
+      "${cfg_dir}/nagios_service.cfg",
+      "${cfg_dir}/nagios_servicedependency.cfg",
+      "${cfg_dir}/nagios_serviceescalation.cfg",
+      "${cfg_dir}/nagios_serviceextinfo.cfg",
+      "${cfg_dir}/nagios_servicegroup.cfg",
+      "${cfg_dir}/nagios_timeperiod.cfg" ]:
+      ensure  => file,
+      replace => false,
+      notify  => Service['nagios'],
+      owner   => root,
+      group   => 0,
+      mode    => '0644';
+  }
+
+  if $nagios::purge_resources {
+    resources {
+      [
+        'nagios_command',
+        'nagios_contactgroup',
+        'nagios_contact',
+        'nagios_hostdependency',
+        'nagios_hostescalation',
+        'nagios_hostextinfo',
+        'nagios_hostgroup',
+        'nagios_host',
+        'nagios_servicedependency',
+        'nagios_serviceescalation',
+        'nagios_servicegroup',
+        'nagios_serviceextinfo',
+        'nagios_service',
+        'nagios_timeperiod',
+      ]:
         notify => Service['nagios'],
-        require => Package['nagios'],
-        mode => 0755, owner => root, group => root;
+        purge  => true;
     }
+  }
 }

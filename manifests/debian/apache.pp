@@ -5,10 +5,9 @@
 #
 class nagios::debian::apache {
 
-  include nagios::defaults::vars
+  include ::nagios::defaults::vars
 
   file { "${nagios::defaults::vars::int_cfgdir}/apache2.conf":
-    ensure => present,
     source => [ "puppet:///modules/site_nagios/configs/${::fqdn}/apache2.conf",
                 'puppet:///modules/site_nagios/configs/apache2.conf',
                 'puppet:///modules/nagios/configs/apache2.conf'],

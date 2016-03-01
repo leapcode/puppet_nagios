@@ -1,12 +1,13 @@
-# configure nagios commands on the server
+# defaults commands we wanna have available
 class nagios::defaults::commands {
 
-  include nagios::command::smtp
-  include nagios::command::imap_pop3
+  include ::nagios::command::smtp
+  include ::nagios::command::imap_pop3
+  include ::nagios::plugins::horde_login
 
   # common service commands
   case $::operatingsystem {
-    debian,ubuntu: {
+    'Debian','Ubuntu': {
       nagios_command {
         'check_dummy':
           command_line => '$USER1$/check_dummy $ARG1$';
@@ -15,7 +16,7 @@ class nagios::defaults::commands {
         'check_http_url':
           command_line => '$USER1$/check_http -H $ARG1$ -u $ARG2$';
         'check_http_url_regex':
-          command_line => '$USER1$/check_http -H $ARG1$ -u $ARG2$ -e $ARG3$';
+          command_line => '$USER1$/check_http -H $ARG1$ -p $ARG2$ -u $ARG3$ -e $ARG4$';
         'check_https_url':
           command_line => '$USER1$/check_http --ssl -H $ARG1$ -u $ARG2$';
         'check_https_url_regex':
@@ -24,10 +25,6 @@ class nagios::defaults::commands {
           command_line => '$USER1$/check_mysql -H $ARG1$ -P $ARG2$ -u $ARG3$ -p $ARG4$ -d $ARG5$';
         'check_ntp_time':
           command_line => '$USER1$/check_ntp_time -H $HOSTADDRESS$ -w 0.5 -c 1';
-        'check_openvpn_server':
-          command_line => '$USER1$/check_openvpn_server.pl -H $HOSTADDRESS$ -p 1194';
-        'check_openvpn_server_ip_port':
-          command_line => '$USER1$/check_openvpn_server.pl -H $ARG1$ -p $ARG2$';
         'check_silc':
           command_line => '$USER1$/check_tcp -p 706 -H $ARG1$';
         'check_sobby':
@@ -99,16 +96,16 @@ class nagios::defaults::commands {
   nagios_command {
     # from apache module
     'http_port':
-        command_line => '$USER1$/check_http -p $ARG1$ -H $HOSTADDRESS$ -I $HOSTADDRESS$';
+      command_line => '$USER1$/check_http -p $ARG1$ -H $HOSTADDRESS$ -I $HOSTADDRESS$';
 
     'check_http_port_url_content':
-        command_line => '$USER1$/check_http -H $ARG1$ -p $ARG2$ -u $ARG3$ -s $ARG4$';
+      command_line => '$USER1$/check_http -H $ARG1$ -p $ARG2$ -u $ARG3$ -s $ARG4$';
     'check_https_port_url_content':
-        command_line => '$USER1$/check_http --ssl -H $ARG1$ -p $ARG2$ -u $ARG3$ -s $ARG4$';
+      command_line => '$USER1$/check_http --ssl -H $ARG1$ -p $ARG2$ -u $ARG3$ -s $ARG4$';
     'check_http_url_content':
-        command_line => '$USER1$/check_http -H $ARG1$ -u $ARG2$ -s $ARG3$';
+      command_line => '$USER1$/check_http -H $ARG1$ -u $ARG2$ -s $ARG3$';
     'check_https_url_content':
-        command_line => '$USER1$/check_http --ssl -H $ARG1$ -u $ARG2$ -s $ARG3$';
+      command_line => '$USER1$/check_http --ssl -H $ARG1$ -u $ARG2$ -s $ARG3$';
 
     # from bind module
     'check_dig2':
@@ -130,14 +127,19 @@ class nagios::defaults::commands {
   # notification commands
 
   $mail_cmd_location = $::operatingsystem ? {
-    centos  => '/bin/mail',
-    default => '/usr/bin/mail'
+    'CentOS' => '/bin/mail',
+    default  => '/usr/bin/mail'
   }
 
-  nagios_command {
-    'notify-host-by-email':
-      command_line => "/usr/bin/printf \"%b\" \"***** Nagios *****\\n\\nNotification Type: \$NOTIFICATIONTYPE\$\\n\\nHost:      \$HOSTNAME\$ (\$HOSTALIAS\$)\\nAddress:   \$HOSTADDRESS\$\\nState:     \$HOSTSTATE\$\\nDuration:  \$HOSTDURATION\$\\n\\nDate/Time: \$LONGDATETIME\$\\n\\nOutput:    \$HOSTOUTPUT\$\" | ${mail_cmd_location} -s \"\$HOSTSTATE\$ - \$HOSTNAME\$\" \$CONTACTEMAIL\$";
-    'notify-service-by-email':
-      command_line => "/usr/bin/printf \"%b\" \"***** Nagios *****\\n\\nNotification Type: \$NOTIFICATIONTYPE\$\\n\\nHost:      \$HOSTNAME\$ (\$HOSTALIAS\$)\\nAddress:   \$HOSTADDRESS\$\\n\\nService:   \$SERVICEDESC\$\\nState:     \$SERVICESTATE\$\\nDuration:  \$SERVICEDURATION\$\\n\\nDate/Time: \$LONGDATETIME\$\\n\\nOutput:    \$SERVICEOUTPUT\$\" | ${mail_cmd_location} -s \"\$SERVICESTATE\$ - \$HOSTALIAS\$: \$SERVICEDESC\$\" \$CONTACTEMAIL\$";
+  case $::lsbdistcodename {
+    'wheezy': { }
+    default: {
+      nagios_command {
+        'notify-host-by-email':
+          command_line => "/usr/bin/printf \"%b\" \"***** Nagios *****\\n\\nNotification Type: \$NOTIFICATIONTYPE\$\\nHost: \$HOSTNAME\$\\nState: \$HOSTSTATE\$\\nAddress: \$HOSTADDRESS\$\\nInfo: \$HOSTOUTPUT\$\\n\\nDate/Time: \$LONGDATETIME\$\\n\" | ${mail_cmd_location} -s \"** \$NOTIFICATIONTYPE\$ Host Alert: \$HOSTNAME\$ is \$HOSTSTATE\$ **\" \$CONTACTEMAIL\$";
+        'notify-service-by-email':
+          command_line => "/usr/bin/printf \"%b\" \"***** Nagios *****\\n\\nNotification Type: \$NOTIFICATIONTYPE\$\\n\\nService: \$SERVICEDESC\$\\nHost: \$HOSTALIAS\$\\nAddress: \$HOSTADDRESS\$\\nState: \$SERVICESTATE\$\\n\\nDate/Time: \$LONGDATETIME\$\\n\\nAdditional Info:\\n\\n\$SERVICEOUTPUT\$\" | ${mail_cmd_location} -s \"** \$NOTIFICATIONTYPE\$ Service Alert: \$HOSTALIAS\$/\$SERVICEDESC\$ is \$SERVICESTATE\$ **\" \$CONTACTEMAIL\$";
+      }
+    }
   }
 }

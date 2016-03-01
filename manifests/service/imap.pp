@@ -1,24 +1,26 @@
+# check an imap service
 define nagios::service::imap(
-  $ensure = 'present',
-  $host = 'absent',
-  $port = '143',
-  $tls = true,
-  $tls_port = '993'
+  $ensure     = 'present',
+  $host       = 'absent',
+  $port       = '143',
+  $tls        = true,
+  $tls_port   = '993'
 ){
 
   $real_host = $host ? {
     'absent' => $name,
-    default => $host
+    default  => $host
   }
 
+  $tls_ensure = $tls ? {
+    true    => $ensure,
+    default => 'absent'
+  }
   nagios::service{
     "imap_${name}_${port}":
       ensure => $ensure;
     "imaps_${name}_${tls_port}":
-      ensure => $tls ? {
-        true => $ensure,
-        default => 'absent'
-        };
+      ensure => $tls_ensure;
   }
 
   if $ensure != 'absent' {
