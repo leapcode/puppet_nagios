@@ -2,7 +2,7 @@ Introduction/Notes
 ==================
 
 This modules was inspired and based on the work of David Schmitt
-The immerda project group adapted and improved this module. 
+The immerda project group adapted and improved this module.
 Mainly we made it using the new native puppet nagios commands
 as well we made it more modular to fit for multidistro usage.
 
@@ -12,21 +12,13 @@ In it's current form, this module can be used on CentOS and Debian.
 Overview
 ========
 
-Requirements
-------------
+To use the nagios resources in an puppetmaster setup you need to activate
+[storeconfigs](https://docs.puppetlabs.com/puppet/latest/reference/configuration.html#storeconfigs) on the puppetmaster.
+You can also use this module in a masterless setup, please set the
+`storeconfigs` parameter to `false` when declaring the nafios class.
 
-To use the nrpe functionality, you will need the perl module installed.
+You need to be running version 0.25 or later of puppet.
 
-To use the nagios resources, activate storeconfigs on the
-puppetmaster.
-
-You need to be running verison 0.25 or later of puppet. 
-
-! Upgrade Notice !
-
- * the irc bot variables changed, they previously had $nagios_ prepended
-   but no longer have that. So you will need to change your local config
-   to use $nsa_server instead of $nagios_nsa_server, for example.
 
 Monitor
 -------
@@ -159,7 +151,7 @@ IRC bot
 
 Notifications can easily be sent to an IRC channel by using a bot. To do so,
 simply include 'nagios::irc_bot' on the nagios server and define the right
-$nsa_* variables (see the 'Variables' section below).
+$nagios_nsa_* variables (see the 'Variables' section below).
 
 You can then use the notification commands 'notify-by-irc' and
 'host-notify-by-irc' with service and host definitions to make them report
@@ -203,7 +195,7 @@ Variables
 Options to change the behavior of the nagios class:
 
 - allow_external_cmd: Set to true, if you'd like to ensure that your http
-                      daemon can write to the external command file. You 
+                      daemon can write to the external command file. You
                       may also need to flip "check_external_commands" in
                       "nagios.cfg" to enable this functionality.
 

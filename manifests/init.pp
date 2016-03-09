@@ -23,6 +23,7 @@ class nagios(
   $service_atboot     = true,
   $purge_resources    = true,
   $gpgkey_checks      = {},
+  $storeconfigs       = true
 ) {
   case $nagios::httpd {
     'absent': { }
