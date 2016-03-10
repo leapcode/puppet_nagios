@@ -18,6 +18,7 @@ class nagios::pnp4nagios {
     owner  => root,
     group  => root,
     notify => Service['nagios'],
+    require => Package['nagios'];
   }
 
   file { 'apache.conf':
@@ -28,19 +29,20 @@ class nagios::pnp4nagios {
     owner   => root,
     group   => root,
     notify  => Service['apache'],
-    require => Package['pnp4nagios'],
+    require => [ Package['apache2'], Package['pnp4nagios'] ],
   }
 
   # run npcd as daemon
 
   file { '/etc/default/npcd':
-    path   => '/etc/default/npcd',
-    source => [ 'puppet:///modules/site_nagios/pnp4nagios/npcd',
+    path    => '/etc/default/npcd',
+    source  => [ 'puppet:///modules/site_nagios/pnp4nagios/npcd',
                 'puppet:///modules/nagios/pnp4nagios/npcd' ],
-    mode   => '0644',
-    owner  => root,
-    group  => root,
-    notify => Service['npcd'];
+    mode    => '0644',
+    owner   => root,
+    group   => root,
+    notify  => Service['npcd'],
+    require => [ Package['nagios'], Package['pnp4nagios'] ];
   }
 
   service { 'npcd':
@@ -56,9 +58,10 @@ class nagios::pnp4nagios {
     path   => '/usr/share/nagios3/htdocs/images/action.gif',
     source => [ 'puppet:///modules/site_nagios/pnp4nagios/action.gif',
                 'puppet:///modules/nagios/pnp4nagios/action.gif' ],
-    mode   => '0644',
-    owner  => root,
-    group  => root,
-    notify => Service['nagios'];
+    mode    => '0644',
+    owner   => root,
+    group   => root,
+    notify  => Service['nagios'],
+    require => Package['nagios'];
   }
 }
