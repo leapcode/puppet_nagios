@@ -2,8 +2,15 @@
 class nagios::pnp4nagios {
   include nagios::defaults::pnp4nagios
 
-  package { [ 'pnp4nagios', 'pnp4nagios-web-config-nagios3']:
-    ensure => installed }
+  package { 'pnp4nagios-web-config-nagios3':
+    ensure => installed
+  }
+
+  package { 'pnp4nagios':
+    ensure  => installed,
+    require => Package['pnp4nagios-web-config-nagios3'],
+  }
+
 
 
   # unfortunatly we can't use the nagios_host and nagios_service
